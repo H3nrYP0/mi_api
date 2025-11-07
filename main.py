@@ -1,20 +1,15 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from database import Base, engine, SessionLocal
+from fastapi import FastAPI
+from sqlalchemy import inspect
+from database import engine
 
 app = FastAPI()
 
-# Crear tablas automáticamente (solo temporal mientras desarrollamos)
-Base.metadata.create_all(bind=engine)
-
-# Dependencia de BD para usar en endpoints
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 @app.get("/")
 def root():
-    return {"message": "API funcionando correctamente con PostgreSQL ✅"}
+    return {"message": "API funcionando con PostgreSQL ✅"}
+
+@app.get("/tablas")
+def mostrar_tablas():
+    inspector = inspect(engine)
+    tablas = inspector.get_table_names()
+    return {"tablas": tablas}
