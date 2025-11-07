@@ -1,16 +1,21 @@
-# database.py
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-import os
 
-# Render te pasa DATABASE_URL como variable de entorno.
+# Cargar variables del archivo .env
+load_dotenv()
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Crear motor de conexión
+if DATABASE_URL is None:
+    raise ValueError("❌ ERROR: La variable DATABASE_URL no está definida")
+
+# SQLAlchemy requiere postgresql://
+DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+
 engine = create_engine(DATABASE_URL)
 
-# Sesión para interactuar con la BD
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
-# Base para los modelos
 Base = declarative_base()
